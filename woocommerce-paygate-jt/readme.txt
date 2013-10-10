@@ -1,4 +1,4 @@
-=== bbPress ===
+=== woocommerce-paygate-jt ===
 Contributors: Jeong daeho
 Tags: woocommerce, korea, paygate, paymentgateway
 Requires at least: 3.5
