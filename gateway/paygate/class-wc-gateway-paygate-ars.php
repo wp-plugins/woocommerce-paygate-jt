@@ -15,17 +15,19 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	 
 class WC_Gateway_PayGate_ars extends WC_Gateway_PayGate {
 	
-	var $access_key;
-	
 	function __construct(){
 		
-		$this->id 					= 'paygate-ars';
+		$this->id 					= 'paygate_ars';
 		$this->method 				= '803';
-		$this->class_name			= str_replace('-', '_', __CLASS__);
 		$this->icon 				= '';
-		$this->method_title 			= 'PayGate [ars]';
+		$this->method_title 		= 'PayGate [ars]';
 		$this->method_description	= 'paygate_ars';
-		
+		$this->supported_currencies = array('KRW');
+        $this->notify_url           = str_replace('https:', 'http:', add_query_arg( 'wc-api', strtolower(__CLASS__), home_url( '/' ) ) ) ;
+
+        // Payment listener/API hook
+        add_action( 'woocommerce_api_'.strtolower(__CLASS__), array( $this, 'process_payment_response' ) );
+
 		parent::__construct();
 	}
 
@@ -34,17 +36,26 @@ class WC_Gateway_PayGate_ars extends WC_Gateway_PayGate {
 		
 		$this->form_fields = array_merge( $this->form_fields, array(
 			'title' => array(
-				'title' => __('Title', 'woocommerce'),
-				'type' => 'text',
-				'description' => __('사용자가 체크 아웃하는 동안 제목을 제어합니다.', 'woocommerce'),
-				'default' => __('핸드폰 결제', 'woocommerce'),
-				'desc_tip' => true,
+				'title'         => __('Title', 'wc_korea_pack'),
+				'type'          => 'text',
+				'description'   => __('This controls the title which the user sees during checkout.', 'wc_korea_pack'),
+				'default'       => __('ARS Payment', 'wc_korea_pack'),
+				'desc_tip'      => true,
 			),
 		));
 	}
 	
-	public function get_paygate_args( ) {
-    		$args = array(
+    public function is_valid_for_use() {
+
+        if ( !in_array( get_woocommerce_currency(), apply_filters( 'wc_korea_pack_supported_currencies_ars', $this->supported_currencies ) ) ) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    public function get_paygate_args( $order ) {
+    	$args = array(
 			'goodcurrency'		=> 'WON',
 		);
 

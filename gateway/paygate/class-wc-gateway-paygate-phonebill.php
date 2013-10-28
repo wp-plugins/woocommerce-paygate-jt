@@ -15,17 +15,19 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	 
 class WC_Gateway_PayGate_phonebill extends WC_Gateway_PayGate {
 	
-	var $access_key;
-	
 	function __construct(){
 		
-		$this->id 					= 'paygate-phonebill';
+		$this->id 					= 'paygate_phonebill';
 		$this->method 				= '802';
-		$this->class_name			= str_replace('-', '_', __CLASS__);
 		$this->icon 				= '';
-		$this->method_title 			= 'PayGate [phonebill]';
+		$this->method_title 		= 'PayGate [phonebill]';
 		$this->method_description	= 'paygate_phonebill';
-		
+		$this->supported_currencies = array('KRW');
+        $this->notify_url           = str_replace('https:', 'http:', add_query_arg( 'wc-api', strtolower(__CLASS__), home_url( '/' ) ) ) ;
+
+        // Payment listener/API hook
+        add_action( 'woocommerce_api_'.strtolower(__CLASS__), array( $this, 'process_payment_response' ) );
+        
 		parent::__construct();
 	}
 
@@ -34,16 +36,25 @@ class WC_Gateway_PayGate_phonebill extends WC_Gateway_PayGate {
 		
 		$this->form_fields = array_merge( $this->form_fields, array(
 			'title' => array(
-				'title' => __('Title', 'woocommerce'),
+				'title' => __('Title', 'wc_korea_pack'),
 				'type' => 'text',
-				'description' => __('사용자가 체크 아웃하는 동안 제목을 제어합니다.', 'woocommerce'),
-				'default' => __('핸드폰 결제', 'woocommerce'),
+				'description' => __('This controls the title which the user sees during checkout.', 'wc_korea_pack'),
+				'default' => __('Phonebill Payment', 'wc_korea_pack'),
 				'desc_tip' => true,
 			),
 		));
 	}
+
+    public function is_valid_for_use() {
+
+        if ( !in_array( get_woocommerce_currency(), apply_filters( 'wc_korea_pack_supported_currencies_mobile', $this->supported_currencies ) ) ) {
+            return false;
+        }
+        
+        return true;
+    }
 	
-	public function get_paygate_args( ) {
+    public function get_paygate_args( $order ) {
     		$args = array(
 			'goodcurrency'		=> 'WON',
 			'replycode' 		=> '',

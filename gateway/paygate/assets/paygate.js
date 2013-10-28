@@ -1,16 +1,15 @@
 function getPGIOresult() {
-        verifyReceived(getPGIOElement("tid"));
-        var replycode = getPGIOElement('replycode');
-        var replyMsg = getPGIOElement('replyMsg');
-        
-		if( replycode=='0000' ){
-			 document.PGIOForm.action = wckp.notify_url;
-			jQuery('#PGIOForm').submit();
-	  	} else {
-			//거래 실패 처리
-			 alert("[" + replyMsg + "] 결제가 실패했습니다. 다시 이용해 주세요");
-	    	window.location=woocommerce_params.cart_url;
-		}
+    verifyReceived(getPGIOElement("tid"));
+    var replycode = getPGIOElement('replycode');
+    var replyMsg = getPGIOElement('replyMsg');
+    
+    if( replycode=='0000' ){
+        jQuery('#PGIOForm').submit();
+    } else {
+        //거래 실패 처리
+        alert( replyMsg + "["+ replycode + "]" + wckp.message_failure );
+        window.location=woocommerce_params.cart_url;
+    }
 }
 
 jQuery(document).ready(function($) {
