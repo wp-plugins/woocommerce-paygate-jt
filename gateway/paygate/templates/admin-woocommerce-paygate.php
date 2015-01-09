@@ -14,4 +14,4 @@
 	</table><!--/.form-table-->
     <?php else : ?>
             <div class="inline error"><p><strong><?php _e( 'Gateway Disabled', 'wc_korea_pack' ); ?></strong>: <?php _e( 'This Gateway does not support your store currency.', 'wc_korea_pack' ); ?></p></div>
-    <?php endif; ?>
+    <?php endif;?>
